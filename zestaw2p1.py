@@ -1,6 +1,8 @@
 import pandas
 import numpy
 from sklearn import linear_model
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 #zmienna zależna (y):  WorkWeekHrs , niezalezne zmienne (x1, x2): CompTotal, CodeRevHrs
@@ -43,13 +45,23 @@ kwantyl2 = result2[(result2['CodeRevHrs'] >= result2['CodeRevHrs'].quantile(.15)
             result2['CodeRevHrs'].quantile(.85))]
 print(kwantyl2)
 
+sns.boxplot(y=kwantyl2['WorkWeekHrs'], x=kwantyl2['CodeRevHrs'], data=kwantyl2)
+plt.show()
+sns.boxplot(y=kwantyl2['WorkWeekHrs'], x=kwantyl2['CodeRevHrs'], data=kwantyl2)
+plt.show()
+
+sns.regplot(y=kwantyl2['WorkWeekHrs'], x=kwantyl2['CompTotal'])
+plt.show()
+
+sns.jointplot(x=kwantyl2['CompTotal'], y=kwantyl2['WorkWeekHrs'], data=kwantyl2, kind='reg')
+plt.show()
+
 rl = linear_model.LinearRegression()
 rl.fit(kwantyl2[['CodeRevHrs']], kwantyl2[['WorkWeekHrs']])
 print(rl.predict([[12]]))
 print(rl.predict([[40]]))
 mse = numpy.mean((rl.predict(kwantyl2[['CodeRevHrs']]) - kwantyl2[['WorkWeekHrs']]) ** 2)
 print("Error:", mse)
-
 
 rl = linear_model.LinearRegression()
 rl.fit(kwantyl2[['CompTotal', 'CodeRevHrs']], kwantyl2[['WorkWeekHrs']])
