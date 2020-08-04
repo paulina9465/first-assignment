@@ -1,13 +1,14 @@
-import pandas
-import numpy
+import pandas as pd
+import numpy as np
 
-file = pandas.read_csv('train.tsv', names=['A', 'B', 'C', 'D', 'E', 'F'], sep='\t')
-metr = file['A']/file['C']
+with open('train.tsv', 'rb') as data:
+    df = pd.read_csv(data, names=['A', 'B', 'C', 'D', 'E', 'F'], sep='\t')
+    metr = df['A']/df['C']
 
-file['metr'] = metr
+    df['metr'] = metr
 
-avgmetr = numpy.mean(file['metr'])
-print(avgmetr)
+    avgmetr = np.mean(df['metr'])
+    print(avgmetr)
 
-conditions = (file[(file['B'] >=3) & (file['metr'] < avgmetr)])
-conditions.to_csv('out1.csv', columns=['B', 'A', 'metr'], header=False, sep='\t')
+    conditions = (df[(df['B'] >=3) & (df['metr'] < avgmetr)])
+    conditions.to_csv('out1.csv', columns=['B', 'A', 'metr'], header=False, sep='\t')

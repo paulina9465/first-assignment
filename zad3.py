@@ -1,7 +1,8 @@
-import pandas
+import pandas as pd
 
-trainFile = pandas.read_csv('train.tsv', names=['A', 'B', 'C', 'D', 'E', 'F'], sep='\t')
-descriptionFile = pandas.read_csv('description.csv')
+with open('train.tsv', 'rb') as data, open('description.csv') as data2:
+    df = pd.read_csv(data, names=['A', 'B', 'C', 'D', 'E', 'F'], sep='\t')
+    df2 = pd.read_csv(data2)
 
-result = trainFile.join(descriptionFile.set_index('liczba'), on='D')
-result.to_csv('out2.csv', header=False, sep='\t')
+    result = df.join(df2.set_index('liczba'), on='D')
+    result.to_csv('out2.csv', header=False, sep='\t')

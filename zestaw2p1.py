@@ -1,50 +1,43 @@
-import pandas
-import numpy
+import pandas as pd
+import numpy as np
 from sklearn import linear_model
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-#zmienna zależna (y):  WorkWeekHrs , niezalezne zmienne (x1, x2): CompTotal, CodeRevHrs
-file = pandas.read_csv('survey_results_public.csv', usecols=['YearsCode', 'Age1stCode', 'CompTotal', 'WorkWeekHrs',
+#dependent variable (y):  WorkWeekHrs , independent variables (x1, x2): CompTotal, CodeRevHrs
+#Choose 5 columns with numeric values, 1 column with text values and 1 column with qualitative data
+df = pd.read_csv('survey_results_public.csv', usecols=['YearsCode', 'Age1stCode', 'CompTotal', 'WorkWeekHrs',
                        'CodeRevHrs', 'Hobbyist', 'MainBranch'])
 
-file.dropna(inplace=True)
-file.replace(to_replace={'Yes': '1', 'No': '0'}, inplace=True)
-print(file)
-print(file.corr())
+df.dropna(inplace=True)
+df.replace(to_replace={'Yes': '1', 'No': '0'}, inplace=True)
+#Looking for dependencies between columns
+print(df.corr())
 
-one_hot = pandas.get_dummies(file['MainBranch'])
-file = file.drop('MainBranch',axis = 1)
-file = file.join(one_hot)
-print(file)
+one_hot = pd.get_dummies(df['MainBranch'])
+df = df.drop('MainBranch',axis = 1)
+df = df.join(one_hot)
 
-mean1 = (numpy.mean(file['CompTotal']))
-print(mean1)
-print('*****************************')
-sd1 = numpy.std(file['CompTotal'])
-print(sd1)
+#Calculate the arithmetic mean and standard deviation
+mean1 = (np.mean(df['CompTotal']))
+sd1 = np.std(df['CompTotal'])
 
-mean2 = (numpy.mean(file['WorkWeekHrs']))
-print(mean2)
-print('*****************************')
-sd2 = numpy.std(file['WorkWeekHrs'])
-print(sd2)
+mean2 = (np.mean(df['WorkWeekHrs']))
+sd2 = np.std(df['WorkWeekHrs'])
 
-mean3 = (numpy.mean(file['CodeRevHrs']))
-print(mean3)
-print('*****************************')
-sd3 = numpy.std(file['CodeRevHrs'])
-print(sd3)
+#Remove outliers using standard deviation
+result = df[(df['CompTotal'] >= (mean1 - 2 *sd1))]
 
-result = file[(file['CompTotal'] >= (mean1 - 2 *sd1))]
-print(result)
+#Remove outliers using standard deviation
 result2 = result[(result['WorkWeekHrs'] >= (mean2 - 2 *sd2))]
-print(result2)
+
+#Remove outliers using standard quantile
 kwantyl2 = result2[(result2['CodeRevHrs'] >= result2['CodeRevHrs'].quantile(.15)) & (result2['CodeRevHrs'] <=
             result2['CodeRevHrs'].quantile(.85))]
-print(kwantyl2)
 
+
+#Create charts
 sns.boxplot(y=kwantyl2['WorkWeekHrs'], x=kwantyl2['CodeRevHrs'], data=kwantyl2)
 plt.show()
 sns.boxplot(y=kwantyl2['WorkWeekHrs'], x=kwantyl2['CodeRevHrs'], data=kwantyl2)
@@ -56,22 +49,23 @@ plt.show()
 sns.jointplot(x=kwantyl2['CompTotal'], y=kwantyl2['WorkWeekHrs'], data=kwantyl2, kind='reg')
 plt.show()
 
+#Create linear regression model
 rl = linear_model.LinearRegression()
 rl.fit(kwantyl2[['CodeRevHrs']], kwantyl2[['WorkWeekHrs']])
 print(rl.predict([[12]]))
 print(rl.predict([[40]]))
-mse = numpy.mean((rl.predict(kwantyl2[['CodeRevHrs']]) - kwantyl2[['WorkWeekHrs']]) ** 2)
+mse = np.mean((rl.predict(kwantyl2[['CodeRevHrs']]) - kwantyl2[['WorkWeekHrs']]) ** 2)
 print("Error:", mse)
 
 rl = linear_model.LinearRegression()
 rl.fit(kwantyl2[['CompTotal', 'CodeRevHrs']], kwantyl2[['WorkWeekHrs']])
 print(rl.coef_)
-mse = numpy.mean((rl.predict(kwantyl2[['CodeRevHrs', 'CompTotal']]) - kwantyl2[['WorkWeekHrs']]) ** 2)
+mse = np.mean((rl.predict(kwantyl2[['CodeRevHrs', 'CompTotal']]) - kwantyl2[['WorkWeekHrs']]) ** 2)
 print("Error:", mse)
 
 rl = linear_model.LinearRegression()
 rl.fit(kwantyl2[['CompTotal', 'CodeRevHrs', 'Hobbyist']], kwantyl2[['WorkWeekHrs']])
-mse = numpy.mean((rl.predict(kwantyl2[['CodeRevHrs', 'CompTotal', 'Hobbyist']]) - kwantyl2[['WorkWeekHrs']]) ** 2)
+mse = np.mean((rl.predict(kwantyl2[['CodeRevHrs', 'CompTotal', 'Hobbyist']]) - kwantyl2[['WorkWeekHrs']]) ** 2)
 print("Error:", mse)
 
 
