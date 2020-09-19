@@ -15,6 +15,7 @@ df.replace(to_replace={'Yes': '1', 'No': '0'}, inplace=True)
 #Looking for dependencies between columns
 print(df.corr())
 
+# using one-hot encoding metod
 one_hot = pd.get_dummies(df['MainBranch'])
 df = df.drop('MainBranch',axis = 1)
 df = df.join(one_hot)

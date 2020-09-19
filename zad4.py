@@ -4,11 +4,13 @@ import matplotlib.pyplot as pyplot
 with open('survey_results_public.csv', 'rb') as data:
     df = pd.read_csv(data, usecols=['ConvertedComp', 'CodeRevHrs', 'BetterLife'])
 
+    
     df.dropna(inplace=True)
-
+ # Get unique values of 'ConvertedComp' column
     column_values1 = df[['ConvertedComp']].values.ravel()
     unique_values = pd.unique(column_values1)
 
+ # Get unique values of 'CodeRevHrs' column
     column_values2 = df[['CodeRevHrs']].values.ravel()
     unique_values2 = pd.unique(column_values2)
     df = df.astype({'ConvertedComp': 'int64', 'CodeRevHrs': 'int64'})
